@@ -1,72 +1,52 @@
+import { render } from "./helpers/render-tasks.js";
+import { renderCategories } from "./helpers/render.categories.js";
+import { Category, Task } from "./types";
 
-const taskNameInputElement: HTMLInputElement = document.querySelector("#name")
-const addButtonElement: HTMLButtonElement = document.querySelector("button")
-const tasksContainerElement: HTMLElement = document.querySelector(".tasks")
+const taskNameInputElement: HTMLInputElement = document.querySelector("#name");
+const addButtonElement: HTMLButtonElement = document.querySelector("button");
+const tasksContainerElement: HTMLElement = document.querySelector(".tasks");
+const categoriesContainerElement: HTMLElement =
+  document.querySelector(".categories");
 
-interface Task {
-    name: string;
-    done: boolean;
-    category?: string;
-}
+let selectedCategory: Category;
 
-const category = ["general", "work", "gym", "hobby"]
+const categories: Category[] = ["general", "work", "gym", "hobby"];
 
-
-const tasks: Task[] = [{
+const tasks: Task[] = [
+  {
     name: "Wyrzucić śmieci",
     done: false,
-    category : "hobby"
-}, {
+    category: "hobby",
+  },
+  {
     name: "Pójśc na siłownię",
     done: true,
-    category: "gym"
-}, {
+    category: "gym",
+  },
+  {
     name: "Nakarmić psa",
     done: false,
-    category: "work"
-}]
+    category: "work",
+  },
+];
 
+const addTask = (task: Task) => {
+  tasks.push(task);
+};
 
-const render = ()=>{
-    tasksContainerElement.innerHTML = "";
+const updateSelectedCategory = (newCategory: Category) => {
+  selectedCategory = newCategory;
+};
 
-    tasks.forEach((task, index)=>{
+addButtonElement.addEventListener("click", (event: Event) => {
+  event.preventDefault();
+  addTask({
+    name: taskNameInputElement.value,
+    done: false,
+    category: selectedCategory,
+  });
+  render(tasks, tasksContainerElement);
+});
 
-        const taskElement: HTMLElement = document.createElement("li")
-        if (task.category) {
-            taskElement.classList.add(task.category)
-        }
-        
-        const id: string = `task-${index}`
-
-        const labelElement: HTMLLabelElement = document.createElement("label")
-        labelElement.innerText = task.name
-        labelElement.setAttribute("for", id)
-
-        const checkBoxElement: HTMLInputElement = document.createElement("input");
-        checkBoxElement.type = "checkbox";
-        checkBoxElement.name = task.name;
-        checkBoxElement.id = id;
-        checkBoxElement.checked = task.done
-        checkBoxElement.addEventListener("change", ()=>{
-            task.done = !task.done;
-        })
-
-        taskElement.appendChild(labelElement)
-        taskElement.appendChild(checkBoxElement)
-
-        tasksContainerElement.appendChild(taskElement);
-    })
-}
-
-const addTask = (task: Task)=>{
-    tasks.push(task)
-}
-
-addButtonElement.addEventListener("click", (event: Event)=>{
-    event.preventDefault();
-    addTask({name: taskNameInputElement.value, done: false});
-    render();
-})
-
-render();
+renderCategories(categories, categoriesContainerElement, updateSelectedCategory);
+render(tasks, tasksContainerElement);
